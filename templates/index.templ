@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>volition</title>
+		<link href="/css/index.css" rel="stylesheet" type="text/css" />
+		
+		<script type="text/javascript">
+			
+			
+			var slide = function(amount) {
+			console.log(document.getElementById('lr-sub-container'));
+				document.getElementById('lr-sub-container').style.left = amount;
+			};
+			
+			
+		</script>
+	</head>
+	<body>
+		@if{context.session().get("user") != null}
+			logged in?
+		@else{}
+		
+			<div id="lr-container">
+				<div id="lr-sub-container">
+					<form>
+						<h1>Sign In</h1>
+						
+						<input type="text" name="email" />
+						
+						<input type="password" name="password" />
+						
+						<input type="submit" value="sign in" />
+						
+						<button type="button" onclick="slide('-100%')">Not a user? Click here to sign up.</button>
+						
+					</form>
+					<form>
+						<h1>Sign Up</h1>
+						<input type="text" name="first_name" />
+						<input type="text" name="last_name" />
+						<input type="text" name="email" />
+						<input type="password" name="password" />
+						<input type="submit" value="sign up" />
+						<button type="button" onclick="slide('0')">Not a user? Click here to sign up.</button>
+					</form>
+				</div>
+			</div>
+		@end{}
+	</body>
+</html>
