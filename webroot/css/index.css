@@ -1,8 +1,15 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300);
 html, body {
   margin: 0;
   padding: 0;
   font-size: 10px;
   font-family: sans-serif; }
+
+.alert-message {
+  text-align: center;
+  font-size: 1.2rem; }
+  .alert-message.error {
+    color: #e74c3c; }
 
 #lr-container {
   position: absolute;
@@ -10,8 +17,7 @@ html, body {
   left: 50%;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  width: 200px;
-  height: 300px;
+  width: 300px;
   overflow: hidden; }
   #lr-container #lr-sub-container {
     width: 200%;
@@ -25,7 +31,49 @@ html, body {
       height: 100%;
       float: left; }
       #lr-container #lr-sub-container form h1 {
-        margin: 0;
-        padding: 0; }
+        margin: 4rem 0;
+        padding: 0;
+        text-align: center;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 4rem;
+        font-weight: 300;
+        color: #2c3e50; }
+      #lr-container #lr-sub-container form input, #lr-container #lr-sub-container form button {
+        -webkit-appearance: none;
+        appearance: none;
+        border: 1px solid #bdc3c7;
+        margin: .5rem 0;
+        background-color: white;
+        outline: none;
+        width: 100%;
+        padding: .7rem;
+        box-sizing: border-box;
+        border-radius: .2rem;
+        font-size: 1.2rem; }
+        #lr-container #lr-sub-container form input[type="submit"], #lr-container #lr-sub-container form button[type="submit"] {
+          background-color: #7f8c8d;
+          border: none;
+          width: auto;
+          font-size: 1.2rem;
+          color: white;
+          float: right;
+          cursor: pointer;
+          -webkit-transition: background 150ms ease-in-out;
+          transition: background 150ms ease-in-out; }
+          #lr-container #lr-sub-container form input[type="submit"]:hover, #lr-container #lr-sub-container form button[type="submit"]:hover {
+            background-color: #27ae60; }
+        #lr-container #lr-sub-container form input.half, #lr-container #lr-sub-container form button.half {
+          width: calc(50% - .5rem);
+          float: left; }
+          #lr-container #lr-sub-container form input.half.one, #lr-container #lr-sub-container form button.half.one {
+            margin-right: 1rem; }
+      #lr-container #lr-sub-container form button {
+        color: #2980b9;
+        border: none;
+        margin: 3rem 0; }
+        #lr-container #lr-sub-container form button:hover {
+          text-decoration: underline;
+          cursor: pointer;
+          text-align: center; }
 
 /*# sourceMappingURL=index.css.map */

@@ -1,8 +1,27 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300);
+
+
+$offwhite: #ecf0f1;
+$blue: #2980b9;
+$green: #27ae60;
+$gray: #7f8c8d;
+$silver: #bdc3c7;
+$darkblue: #2c3e50;
+$red: #e74c3c;
+
 html, body {
 	margin: 0;
 	padding: 0;
 	font-size: 10px;
 	font-family: sans-serif;
+}
+
+.alert-message {
+	text-align: center;
+	font-size: 1.2rem;
+	&.error {
+		color: $red;
+	}
 }
 
 #lr-container {
@@ -11,8 +30,7 @@ html, body {
 	left: 50%;
 	-webkit-transform: translate(-50%, -50%);
 	transform: translate(-50%, -50%);
-	width: 200px;
-	height: 300px;
+	width: 300px;
 	overflow: hidden;
 	#lr-sub-container {
 		width: 200%;
@@ -22,13 +40,62 @@ html, body {
 		-webkit-transition: left 200ms ease-in-out;
 		transition: left 200ms ease-in-out;
 		form {
-			h1 {
-				margin: 0;
-				padding: 0;
-			}
 			width: 50%;
 			height: 100%;
 			float: left;
+			h1 {
+				margin: 4rem 0;
+				padding: 0;
+				text-align: center;
+				font-family: 'Open Sans', sans-serif;
+				font-size: 4rem;
+				font-weight: 300;
+				color: #2c3e50;
+			}
+			input, button {
+				-webkit-appearance: none;
+				appearance: none;
+				border: 1px solid $silver;
+				margin: .5rem 0;
+				background-color: white;
+				outline: none;
+				width: 100%;
+				padding: .7rem;
+				box-sizing: border-box;
+				border-radius: .2rem;
+				font-size: 1.2rem;
+				&[type="submit"] {
+					background-color: $gray; 
+					border: none;
+					width: auto;
+					font-size: 1.2rem;
+					color: white;
+					float: right;
+					cursor: pointer;
+					-webkit-transition: background 150ms ease-in-out;
+					transition: background 150ms ease-in-out;
+					&:hover {
+						background-color: $green;
+					}
+				}
+				&.half {
+					width: calc(50% - .5rem);
+					float: left;
+					&.one {
+						margin-right: 1rem;
+					}
+				}
+			}
+			button {
+				color: $blue;
+				border: none;
+				margin: 3rem 0;
+				&:hover {
+					text-decoration: underline;
+					cursor: pointer;
+					text-align: center;
+				}
+			}
 		}
 	}
 }
