@@ -3,50 +3,10 @@
 	<head>
 		<title>volition</title>
 		<link href="/css/index.css" rel="stylesheet" type="text/css" />
-		
-		<script type="text/javascript">
-			
-			
-			var slide = function(amount) {
-			console.log(document.getElementById('lr-sub-container'));
-				document.getElementById('lr-sub-container').style.left = amount;
-			};
-			
-			
-		</script>
+		<link href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
 	</head>
 	<body>
-		@if{context.session().get("user") != null}
-			logged in?
-		@else{}
-			<div id="lr-container">
-				@if{context.get('error') != null}
-					<div class="alert-message error">@{context.get('error')}</div>
-				@end{}
-				<div id="lr-sub-container">
-					<form method="post" action="/login">
-						<h1>Sign In</h1>
-						<input type="text" name="email" autocomplete="off" placeholder="email" />
-						<input type="password" name="password" placeholder="password" />
-						<input type="submit" value="sign in" />
-						<button type="button" onclick="slide('-100%')">Not a user? Click here to sign up.</button>
-					</form>
-					<form method="post" action="/register">
-						<h1>Sign Up</h1>
-						<input type="text" class="half one" name="first_name" autocomplete="off" placeholder="first name" />
-						<input type="text" class="half two" name="last_name" autocomplete="off" placeholder="last name" />
-						<input type="text" name="email" autocomplete="off" placeholder="email" />
-						<input type="password" name="password" placeholder="password (at least 6 characters long)" />
-						<input type="submit" value="sign up" />
-						<button type="button" onclick="slide('0')">Not a user? Click here to sign up.</button>
-					</form>
-				</div>
-			</div>
-		@end{}
-		@if{context.get('form') == "register"}
-			<script type="text/javascript">
-				slide('-100%');
-			</script>
-		@end{}
+		@include{context.get('page')}
 	</body>
 </html>

@@ -9,6 +9,11 @@ $silver: #bdc3c7;
 $darkblue: #2c3e50;
 $red: #e74c3c;
 
+@mixin transition($trans) {
+	-webkit-transition: $trans;
+	transition: $trans;
+}
+
 html, body {
 	margin: 0;
 	padding: 0;
@@ -21,6 +26,78 @@ html, body {
 	font-size: 1.2rem;
 	&.error {
 		color: $red;
+	}
+}
+
+.box {
+	width: calc(20% - 1rem);
+	margin: .5rem;
+	border: 1px solid $silver;
+	border-radius: .2rem;
+	form {
+		padding: .6rem;
+		border-radius: .2rem;
+		line-height: 1rem;
+		textarea {
+			width: 100%;
+			height: 80px;
+			resize: none;
+			border-radius: .2rem;
+			-webkit-appearance: none;
+			background-color: $offwhite;
+			appearance: none;
+			outline: none;
+			border: none;
+			box-sizing: border-box;
+			font-family: sans-serif;
+			padding: 1rem;
+		}
+		input {
+			-webkit-appearance: none;
+			appearance: none;
+			padding: .5rem 2rem;
+			margin: .5rem 0 0 0;
+			float: right;
+			border: none;
+			font-size: 1.1rem;
+			box-sizing: border-box;
+			background-color: $green;
+			color: white;
+		}
+	}
+}
+
+header {
+	height: 5rem;
+	line-height: 5rem;
+	background-color: $darkblue;
+	font-size: 1.2rem;
+	a {
+		display: inline-block;
+		width: auto;
+		height: 5rem;
+		line-height: 5rem;
+		padding: 0 3rem;
+		margin: 0;
+		color: white !important;
+		text-decoration: none;
+		float: left;
+		i {
+			font-size: 2rem;
+		}
+	}
+	input[type="text"] {
+		margin: 1rem 0;
+		padding: 0 1rem;
+		height: 3rem;
+		-webkit-appearance: none;
+		appearance: none;
+		border: none;
+		background-color: white;
+		outline: none;
+		width: 300px;
+		float: left;
+		border-radius: .2rem;
 	}
 }
 
@@ -37,8 +114,7 @@ html, body {
 		position: relative;
 		top: 0px;
 		left: 0px;
-		-webkit-transition: left 200ms ease-in-out;
-		transition: left 200ms ease-in-out;
+		@include transition(left 200ms ease-in-out);
 		form {
 			width: 50%;
 			height: 100%;
@@ -72,8 +148,7 @@ html, body {
 					color: white;
 					float: right;
 					cursor: pointer;
-					-webkit-transition: background 150ms ease-in-out;
-					transition: background 150ms ease-in-out;
+					@include transition(background 150ms ease-in-out);
 					&:hover {
 						background-color: $green;
 					}

@@ -1,9 +1,15 @@
 package io.honerlaw.volition;
 
-import org.mindrot.jbcrypt.BCrypt;
+import java.lang.reflect.Method;
+import java.util.Set;
 
+import org.reflections.Reflections;
+
+import io.honerlaw.volition.handler.Route;
+import io.honerlaw.volition.handler.RouteRequest;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
@@ -11,9 +17,6 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.templ.MVELTemplateEngine;
 import io.vertx.ext.web.handler.CookieHandler;
 import io.vertx.ext.jdbc.JDBCClient;
-import io.vertx.ext.sql.ResultSet;
-import io.vertx.ext.sql.SQLConnection;
-import io.vertx.ext.sql.UpdateResult;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.SessionHandler;
@@ -21,116 +24,95 @@ import io.vertx.ext.web.sstore.LocalSessionStore;
 
 public class VolitionService extends AbstractVerticle {
 	
+	// create the template engine
 	private final MVELTemplateEngine templateEngine = MVELTemplateEngine.create().setMaxCacheSize(0);
 	
 	@Override
 	public void start() {
 		
+		// disable file caching by the template engine
 		System.setProperty("vertx.disableFileCaching", "true");
 		
+		// create the database connection pool
 		JDBCClient client = JDBCClient.createShared(getVertx(), new JsonObject()
 				.put("url", "")
 				.put("user", "")
 				.put("password", ""));
 		
+		// create the router
 		Router router = Router.router(getVertx());
 		
 		// create the session / cookie handler
 		router.route().handler(CookieHandler.create());
 		router.route().handler(SessionHandler.create(LocalSessionStore.create(getVertx())));
-		
-		// create the body handler
 		router.route().handler(BodyHandler.create());
-	
-		// login / register page OR main account home page
-		router.get("/").handler(ctx -> render(ctx, "index"));
 		
-		// handle a login request
-		router.post("/login").handler(ctx -> {
-			String email = ctx.request().getFormAttribute("email").trim();
-			String password = ctx.request().getFormAttribute("password");
-			client.getConnection(res -> {
-				if(res.succeeded()) {
-					SQLConnection con = res.result();
-					con.queryWithParams("SELECT * FROM users WHERE UPPER(email) = UPPER(?)", new JsonArray().add(email), searchRes -> {
-						con.close();
-						if(searchRes.succeeded()) {
-							ResultSet set = searchRes.result();
-							if(set.getNumRows() > 0) {
-								JsonObject user = set.getRows().get(0);
-								if(BCrypt.checkpw(password, user.getString("hash"))) {
-									ctx.session().put("user", user.getLong("id"));
-									ctx.response().setStatusCode(302).putHeader("location", "/").end();
-									return;
-								} else {
-									ctx.put("error", "invalid username or password.");
-								}
-							} else {
-								ctx.put("error", "invalid username or password");
-							}
-						} else {
-							searchRes.cause().printStackTrace();
-						}
-						render(ctx, "index");
-					});
-				} else {
-					res.cause().printStackTrace();
-					ctx.put("error", "invalid username or password.");
-					render(ctx, "index");
-				}
-			});
-		});
-		
-		// handle a register request
-		router.post("/register").handler(ctx -> {
-			String firstName = ctx.request().getFormAttribute("first_name").trim();
-			String lastName = ctx.request().getFormAttribute("last_name").trim();
-			String email = ctx.request().getFormAttribute("email").trim();
-			String password = ctx.request().getFormAttribute("password");
-			
-			// mark that we are working with the register form (for errors)
-			ctx.put("form", "register");
-			
-			// check if this is a valid request
-			if(firstName.length() == 0 || lastName.length() == 0 || email.length() == 0 || password.length() < 6) {
-				ctx.put("error", "all fields are required and a password must be at least 6 characters in length.");
-				render(ctx, "index");
-			} else {
-				client.getConnection(res -> {
-					if(res.succeeded()) {
-						// create the array of data to insert
-						JsonArray insert = new JsonArray()
-							.add(firstName)
-							.add(lastName)
-							.add(email)
-							.add(BCrypt.hashpw(password, BCrypt.gensalt(12)));
+		// find all of the classes that have routes defined for them
+		Set<Class<?>> classes = new Reflections().getTypesAnnotatedWith(Route.class);
+		for(Class<?> clazz : classes) {
+			try {
+				Object instance = clazz.newInstance();
+				Route classRoute = clazz.getAnnotation(Route.class);
+				
+				// find all of the methods in the class that has routes defined
+				for(Method method : clazz.getDeclaredMethods()) {
+					Route methodRoute = method.getAnnotation(Route.class);
+					if(methodRoute != null) {
 						
-						// attempt to insert the data
-						SQLConnection con = res.result();
-						con.updateWithParams("INSERT INTO users (first_name, last_name, email, hash) VALUES (UPPER(?), UPPER(?), UPPER(?), ?)", insert, insertRes -> {
-							con.close();
-							if(insertRes.succeeded()) {
-								UpdateResult result = insertRes.result();
-								if(result.getUpdated() == 1) {
-									ctx.session().put("user", result.getKeys().getLong(0));
-									ctx.response().setStatusCode(302).putHeader("location", "/").end();
+						// create the route, replace any duplicated forward slashes with a single forward slash
+						String route = (classRoute.route() + methodRoute.route()).trim().replaceAll("/+", "/");
+						
+						// register the route
+						router.route(methodRoute.method(), route).handler(ctx -> {
+							
+							// if the route requires authentication, check that they are logged in
+							if(methodRoute.auth()) {
+								if(ctx.session().get("user") == null) {
+									ctx.response().setStatusCode(401).setStatusMessage("Unauthorized").end("You must be logged in to view this page.");
 									return;
-								} else {
-									ctx.put("error", "a user with the given email already exists.");
 								}
-							} else {
-								insertRes.cause().printStackTrace();
-								ctx.put("error", "a user with the given email already exists.");
 							}
-							render(ctx, "index");
+							
+							// request may block event thread so execute in a worker
+							getVertx().executeBlocking(fut -> {
+								
+								// handle the request
+								try {
+									method.invoke(instance, new RouteRequest(ctx, fut, client));
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+								
+							}, res -> {
+								
+								// handle the result
+								if(res.succeeded()) {
+									
+									Object temp = res.result();
+									if(temp instanceof String) {
+										ctx.put("page", "templates/" + (String) temp + ".templ");
+										render(ctx);
+									} else if(temp == null) {
+										ctx.put("page", "templates" + route + ".templ");
+										render(ctx);
+									} else if(temp instanceof HttpServerResponse) {
+										((HttpServerResponse) temp).end();
+									} else if(temp instanceof JsonObject || temp instanceof JsonArray) {
+										ctx.response().setStatusCode(200).putHeader("Content-Type", "application/json").end(temp.toString());
+									}
+									
+								} else {
+									res.cause().printStackTrace();
+									ctx.response().setStatusCode(500).setStatusMessage("Internal Server Error").end("Internal Server Error");
+								}
+							});
 						});
-					} else {
-						res.cause().printStackTrace();
-						render(ctx, "index");
 					}
-				});
+				}
+			} catch (InstantiationException | IllegalAccessException e) {
+				e.printStackTrace();
 			}
-		});
+		}
 		
 		// set the static handler for serving static files (mostly assets)
 		router.route().handler(StaticHandler.create().setCachingEnabled(false));
@@ -139,12 +121,12 @@ public class VolitionService extends AbstractVerticle {
 		getVertx().createHttpServer().requestHandler(router::accept).listen(80);
 	}
 	
-	private void render(RoutingContext ctx, String path) {
-		templateEngine.render(ctx, "templates/" + path + ".templ", res -> {
-			if(res.succeeded()) {
-				ctx.response().end(res.result());
+	private void render(RoutingContext ctx) {
+		templateEngine.render(ctx, "templates/index.templ", templateRes -> {
+			if(templateRes.succeeded()) {
+				ctx.response().end(templateRes.result());
 			} else {
-				ctx.fail(res.cause());
+				ctx.fail(templateRes.cause());
 			}
 		});
 	}

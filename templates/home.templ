@@ -1,0 +1,33 @@
+
+<header>
+	<a href="/"><i class="ion-home"></i></a>
+	<input type="text" name="q" placeholder="Search for friends or content" />
+	<a href="/logout" style="float: right;"><i class="ion-android-exit"></i></a>
+</header>
+
+<div class="box">
+	
+	<form action="/post/create", method="post">
+		<textarea></textarea>
+		<input type="submit" value="post" />
+		<div style="clear: both;"></div>
+	</form>
+
+</div>
+
+<div id="results">
+	
+</div>
+
+<script type="text/javascript">
+	$('input[name="q"]').on('keyup', function() {
+		var query = $(this).val().trim();
+		$.get("/search?q=" + query, function(data) {
+			$('#results').html('');
+			for(var i = 0; i < data.results.length; ++i) {
+				$('#results').append('<div>'+data.results[i].first_name+'</div>');
+			}
+		});
+	});
+	
+</script>

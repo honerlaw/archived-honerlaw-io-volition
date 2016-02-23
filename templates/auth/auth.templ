@@ -1,0 +1,37 @@
+
+
+<div id="lr-container">
+	@if{context.get('error') != null}
+		<div class="alert-message error">@{context.get('error')}</div>
+	@end{}
+	<div id="lr-sub-container">
+		<form method="post" action="/login">
+			<h1>Sign In</h1>
+			<input type="text" name="email" autocomplete="off" placeholder="email" />
+			<input type="password" name="password" placeholder="password" />
+			<input type="submit" value="sign in" />
+			<button type="button" onclick="slide('-100%')">Not a user? Click here to sign up.</button>
+		</form>
+		<form method="post" action="/register">
+			<h1>Sign Up</h1>
+			<input type="text" class="half one" name="first_name" autocomplete="off" placeholder="first name" />
+			<input type="text" class="half two" name="last_name" autocomplete="off" placeholder="last name" />
+			<input type="text" name="email" autocomplete="off" placeholder="email" />
+			<input type="password" name="password" placeholder="password (at least 6 characters long)" />
+			<input type="submit" value="sign up" />
+			<button type="button" onclick="slide('0')">Not a user? Click here to sign up.</button>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var slide = function(amount) {
+		$('#lr-sub-container').css('left', amount);
+	};
+</script>
+
+@if{context.get('form') == "register"}
+	<script type="text/javascript">
+		slide('-100%');
+	</script>
+@end{}
