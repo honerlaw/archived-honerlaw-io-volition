@@ -30,7 +30,7 @@ public class VolitionService extends AbstractVerticle {
 	@Override
 	public void start() {
 		
-		// disable file caching by the template engine
+		// disable file caching by the template engine (for development)
 		System.setProperty("vertx.disableFileCaching", "true");
 		
 		// create the database connection pool
@@ -88,6 +88,7 @@ public class VolitionService extends AbstractVerticle {
 								// handle the result
 								if(res.succeeded()) {
 									
+									// if the execution succeed we will be sending out success status codes
 									Object temp = res.result();
 									if(temp instanceof String) {
 										ctx.put("page", "templates/" + (String) temp + ".templ");
@@ -102,7 +103,17 @@ public class VolitionService extends AbstractVerticle {
 									}
 									
 								} else {
-									res.cause().printStackTrace();
+									
+									// if the execution failed we will be sending out error status codes
+									if(res.cause() != null) {
+										res.cause().printStackTrace();
+									}									
+									Object temp = res.result();
+									if(temp instanceof Throwable) {
+										((Throwable) temp).printStackTrace();
+									} else {
+										System.err.println(temp);
+									}
 									ctx.response().setStatusCode(500).setStatusMessage("Internal Server Error").end("Internal Server Error");
 								}
 							});

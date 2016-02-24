@@ -1,5 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300);
-
+@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono);
 
 $offwhite: #ecf0f1;
 $blue: #2980b9;
@@ -19,6 +19,8 @@ html, body {
 	padding: 0;
 	font-size: 10px;
 	font-family: sans-serif;
+	height: 100%;
+	width: 100%;
 }
 
 .alert-message {
@@ -29,54 +31,17 @@ html, body {
 	}
 }
 
-.box {
-	width: calc(20% - 1rem);
-	margin: .5rem;
-	border: 1px solid $silver;
-	border-radius: .2rem;
-	form {
-		padding: .6rem;
-		border-radius: .2rem;
-		line-height: 1rem;
-		textarea {
-			width: 100%;
-			height: 80px;
-			resize: none;
-			border-radius: .2rem;
-			-webkit-appearance: none;
-			background-color: $offwhite;
-			appearance: none;
-			outline: none;
-			border: none;
-			box-sizing: border-box;
-			font-family: sans-serif;
-			padding: 1rem;
-		}
-		input {
-			-webkit-appearance: none;
-			appearance: none;
-			padding: .5rem 2rem;
-			margin: .5rem 0 0 0;
-			float: right;
-			border: none;
-			font-size: 1.1rem;
-			box-sizing: border-box;
-			background-color: $green;
-			color: white;
-		}
-	}
-}
-
+/*
 header {
-	height: 5rem;
-	line-height: 5rem;
+	height: 3.5rem;
+	line-height: 3.5rem;
 	background-color: $darkblue;
 	font-size: 1.2rem;
 	a {
 		display: inline-block;
 		width: auto;
-		height: 5rem;
-		line-height: 5rem;
+		height: 3.5rem;
+		line-height: 3.5rem;
 		padding: 0 3rem;
 		margin: 0;
 		color: white !important;
@@ -87,9 +52,9 @@ header {
 		}
 	}
 	input[type="text"] {
-		margin: 1rem 0;
+		margin: .5rem 0;
 		padding: 0 1rem;
-		height: 3rem;
+		height: 2.5rem;
 		-webkit-appearance: none;
 		appearance: none;
 		border: none;
@@ -98,6 +63,25 @@ header {
 		width: 300px;
 		float: left;
 		border-radius: .2rem;
+	}
+}
+*/
+
+header {
+	height: 4rem;
+	line-height: 4rem;
+	font-family: 'Ubuntu Mono', ;
+	font-size: 1.5rem;
+	a {
+		display: inline-block;
+		text-decoration: none;
+		color: $darkblue !important;
+		padding: 0 3rem;
+		text-transform: uppercase;
+		@include transition(color 150ms ease-in-out);
+		&:hover {
+			color: $gray !important;
+		}
 	}
 }
 
@@ -171,6 +155,77 @@ header {
 					text-align: center;
 				}
 			}
+		}
+	}
+}
+
+#friends {
+	width: 300px;
+	padding: .5rem;
+	input {
+		-webkit-appearance: none;
+		appearance: none;
+		border: 1px solid $silver;
+		padding: 1rem;
+		margin: .5rem;
+		font-size: 1.2rem;
+		width: 100%;
+		box-sizing: border-box;
+		border-radius: .2rem;
+	}
+	.friend {
+		position: relative;
+		margin: .5rem;
+		height: 4rem;
+		line-height: 4rem;
+		text-align: center;
+		color: white;
+		width: 4rem;
+		border-radius: 50%;
+		overflow: hidden;
+		background-color: $green;
+		font-size: 1.3rem;
+		float: left;
+	}
+	.friend-search {
+		width: 100%;
+		margin: 0 .5rem;
+		@include transition(background 150ms ease-in-out);
+		.friend-info {
+			width: calc(100% - 11rem);
+			height: 5rem;
+			float: left;
+			padding-left: 1rem;
+			.friend-name {
+				margin: .7rem 0 0 0;
+				height: 2rem;
+				line-height: 2rem;
+				font-size: 1.4rem;
+			}
+			.friend-email {
+				height: 1.3rem;
+				line-height: 1.3rem;
+				font-size: 1.1rem;
+				font-style: italic;
+				text-transform: lowercase;
+			}
+		}
+		.friend-add {
+			width: 5rem;
+			height: 5rem;
+			line-height: 5rem;
+			float: left;
+			text-align: center;
+			font-size: 1.4rem;
+			cursor: pointer;
+			@include transition(background color 150ms ease-in-out);
+			&:active, &:hover {
+				background-color: $green;
+				color: white;
+			}
+		}
+		&:hover {
+			background-color: $offwhite;
 		}
 	}
 }

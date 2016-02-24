@@ -10,7 +10,7 @@ import io.vertx.core.http.HttpMethod;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD })
 public @interface Route {
-	String route();
+	String route() default "";
 	HttpMethod method() default HttpMethod.GET;
 	boolean auth() default false;
 }

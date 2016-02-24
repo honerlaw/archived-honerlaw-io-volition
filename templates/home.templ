@@ -1,31 +1,71 @@
 
 <header>
+	<a href="/" id="title">volition</a>
+	<a href="/logout" style="float: right">logout</a>
+</header>
+
+<div id="friends">
+	<input type="text" name="q" placeholder="Search for friends..." />
+	
+	<!-- this will be the list of friends that we are searching for -->
+	<div id="friends-search-results"></div>
+	
+	<!-- This will be a list of friends that we are currently friends with -->
+	<div id="friends-list">
+		
+	</div>
+</div>
+
+<!--
+<header>
 	<a href="/"><i class="ion-home"></i></a>
 	<input type="text" name="q" placeholder="Search for friends or content" />
 	<a href="/logout" style="float: right;"><i class="ion-android-exit"></i></a>
 </header>
 
-<div class="box">
-	
-	<form action="/post/create", method="post">
-		<textarea></textarea>
-		<input type="submit" value="post" />
-		<div style="clear: both;"></div>
-	</form>
-
-</div>
-
 <div id="results">
 	
 </div>
+-->
 
 <script type="text/javascript">
 	$('input[name="q"]').on('keyup', function() {
 		var query = $(this).val().trim();
-		$.get("/search?q=" + query, function(data) {
-			$('#results').html('');
+		$.get("/friend/search?q=" + query, function(data) {
+			console.log(data);
+			$('#friends-search-results').html('');
 			for(var i = 0; i < data.results.length; ++i) {
-				$('#results').append('<div>'+data.results[i].first_name+'</div>');
+			
+				// so if fid exists then we are friends (remove)
+				// if requestor == id then they are the requestor (accept / deny)
+				// if requestee == id then they are the requestee (cancel)
+				// otherwise (add)
+			
+				var friend = data.results[i];
+				var name = friend.first_name + " " + friend.last_name;
+				var initials = friend.first_name[0] + friend.last_name[0];
+				$('#friends-search-results').append('<div class="friend-search">\
+					<div class="friend">'+initials+'</div>\
+					<div class="friend-info">\
+						<div class="friend-name">'+name+'</div>\
+						<div class="friend-email">'+friend.email+'</div>\
+					</div>\
+					<div class="friend-add" friend-id="'+friend.id+'"><i class="ion-plus"></i></div>\
+					<div style="clear: both;"></div>\
+				</div>');
+			}
+		});
+	});
+	
+	$('#friends-search-results').on('click', '.friend-add', function() {
+		var id = $(this).attr('friend-id');
+		$.ajax({
+			url: '/friend/request',
+			type: 'POST',
+			dataType: 'json',
+			data: { id : id },
+			success: function(data) {
+				console.log(data);
 			}
 		});
 	});
